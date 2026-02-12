@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
+        exclude:
+          - os: windows
+            arch: arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            go build -trimpath -o "dist/mpr.exe" ./
+          else
+            go build -trimpath -o "dist/mpr" ./
+          fi
+
+      - name: Package
+        run: |
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            zip -j "dist/mpr-${{ matrix.os }}-${{ matrix.arch }}.zip" "dist/mpr.exe"
+          else
+            tar -czf "dist/mpr-${{ matrix.os }}-${{ matrix.arch }}.tar.gz" -C dist mpr
+          fi
+
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum mpr-* > checksums.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
