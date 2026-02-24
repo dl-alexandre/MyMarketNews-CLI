@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master, main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -45,6 +49,13 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: test
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
+        exclude:
+          - os: windows
+            arch: arm64
 
     steps:
       - name: Checkout code
@@ -56,8 +67,25 @@ jobs:
           go-version: '1.25.x'
           cache: true
 
-      - name: Build
-        run: go build -o mpr ./main.go
+      - name: Build binaries
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          mkdir -p bin
+          binary_name="mpr-${{ matrix.os }}-${{ matrix.arch }}"
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            go build -trimpath -ldflags "-s -w" -o "bin/${binary_name}.exe" ./main.go
+          else
+            go build -trimpath -ldflags "-s -w" -o "bin/${binary_name}" ./main.go
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.os }}-${{ matrix.arch }}
+          path: bin/
+          retention-days: 7
 
   lint:
     name: Lint
@@ -78,3 +106,22 @@ jobs:
         with:
           version: latest
           args: --timeout=5m
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
