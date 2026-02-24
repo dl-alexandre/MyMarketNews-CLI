@@ -1,8 +1,10 @@
-.PHONY: build build-all test lint clean install
+.PHONY: build build-all test lint clean install deps format install-hooks
 
 BINARY_NAME=mpr
 VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-LDFLAGS=-ldflags "-X main.version=$(VERSION) -s -w"
+GIT_COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
+LDFLAGS=-ldflags "-X main.version=$(VERSION) -X main.gitCommit=$(GIT_COMMIT) -X main.buildTime=$(BUILD_TIME) -s -w"
 
 # Build for current platform
 build:
@@ -33,6 +35,22 @@ deps:
 clean:
 	rm -f $(BINARY_NAME)
 	rm -rf dist/
+
+# Format code
+format:
+	@echo "Formatting code..."
+	@gofmt -w -s .
+	@if command -v goimports >/dev/null 2>&1; then \
+		goimports -w .; \
+	else \
+		echo "goimports not installed. Install: go install golang.org/x/tools/cmd/goimports@latest"; \
+	fi
+
+# Install git hooks
+install-hooks:
+	@echo "Installing git hooks..."
+	@git config core.hooksPath .githooks
+	@echo "Hooks installed from .githooks/"
 
 # Install locally
 install: build
