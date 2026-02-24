@@ -121,7 +121,7 @@ func urlCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Fprintln(os.Stdout, url)
+			_, _ = fmt.Fprintln(os.Stdout, url)
 			return nil
 		},
 	}
@@ -190,7 +190,7 @@ func curlCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(os.Stdout, "curl -s '%s'\n", url)
+			_, _ = fmt.Fprintf(os.Stdout, "curl -s '%s'\n", url)
 			return nil
 		},
 	}
@@ -258,7 +258,7 @@ func correctionsCmd() *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc("section", sectionCompletion)
 
 	flags = addCommonFlags(cmd, defaultFlags{section: "", limitDays: 180, chunkDays: 0})
-	cmd.MarkFlagRequired("section")
+	_ = cmd.MarkFlagRequired("section")
 	cmd.Flags().StringVar(&since, "since", "", "Only include corrections since date")
 	addOutputFlags(cmd, flags)
 	return cmd
@@ -300,7 +300,7 @@ func recentCmd() *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc("section", sectionCompletion)
 
 	flags = addCommonFlags(cmd, defaultFlags{section: "", limitDays: 180, chunkDays: 0})
-	cmd.MarkFlagRequired("section")
+	_ = cmd.MarkFlagRequired("section")
 	cmd.Flags().IntVar(&lastDays, "last-days", 0, "Include last N days")
 	cmd.Flags().IntVar(&lastReports, "last-reports", 0, "Include last N reports")
 	addOutputFlags(cmd, flags)
@@ -347,7 +347,7 @@ func emailCmd() *cobra.Command {
 
 	flags = addCommonFlags(cmd, defaultFlags{section: "Summary", limitDays: 30, chunkDays: 0})
 	cmd.Flags().StringVar(&email, "to", "", "Email address for ZIP")
-	cmd.MarkFlagRequired("to")
+	_ = cmd.MarkFlagRequired("to")
 	addOutputFlags(cmd, flags)
 	return cmd
 }

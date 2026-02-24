@@ -60,7 +60,7 @@ func (c *Client) Get(ctx context.Context, url string) ([]byte, int, error) {
 		}
 
 		body, readErr := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		if readErr != nil {
 			return nil, resp.StatusCode, readErr
 		}
@@ -114,7 +114,7 @@ func isRetryableStatus(code int) bool {
 func isRetryableError(err error) bool {
 	var netErr net.Error
 	if errors.As(err, &netErr) {
-		return netErr.Timeout() || netErr.Temporary()
+		return netErr.Timeout()
 	}
 	return false
 }

@@ -56,9 +56,9 @@ func loadReports(ctx context.Context, cfg config.Config, refresh bool) ([]models
 }
 
 func writeJSON(data []byte) {
-	os.Stdout.Write(data)
+	_, _ = os.Stdout.Write(data)
 	if len(data) == 0 || data[len(data)-1] != '\n' {
-		fmt.Fprintln(os.Stdout)
+		_, _ = fmt.Fprintln(os.Stdout)
 	}
 }
 

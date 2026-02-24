@@ -1,13 +1,16 @@
 package main
 
 import (
-	"os"
-
-	"mpr/internal/commands"
-	"mpr/internal/util"
+	"github.com/alecthomas/kong"
+	"mpr/internal/cli"
 )
 
 func main() {
-	os.Args = util.PreprocessArgs(os.Args)
-	commands.Execute()
+	var c cli.CLI
+	ctx := kong.Parse(&c,
+		kong.Name("mpr"),
+		kong.Description("CLI for USDA AMS MPR Datamart"),
+		kong.UsageOnError(),
+	)
+	ctx.FatalIfErrorf(ctx.Run(&c.Globals))
 }

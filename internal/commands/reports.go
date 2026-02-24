@@ -69,9 +69,9 @@ func reportsListCmd() *cobra.Command {
 			}
 
 			w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-			fmt.Fprintln(w, "slug_id\tslug_name\treport_title\tpublished_date")
+			_, _ = fmt.Fprintln(w, "slug_id\tslug_name\treport_title\tpublished_date")
 			for _, report := range filtered {
-				fmt.Fprintf(w, "%d\t%s\t%s\t%s\n", report.SlugID, report.SlugName, report.ReportTitle, report.PublishedDate)
+				_, _ = fmt.Fprintf(w, "%d\t%s\t%s\t%s\n", report.SlugID, report.SlugName, report.ReportTitle, report.PublishedDate)
 			}
 			return w.Flush()
 		},
