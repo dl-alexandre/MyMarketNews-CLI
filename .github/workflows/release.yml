@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-release:
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -45,9 +45,29 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" = "windows" ]; then
             zip -j "dist/mpr-${{ matrix.os }}-${{ matrix.arch }}.zip" "dist/mpr.exe"
+            rm dist/mpr.exe
           else
             tar -czf "dist/mpr-${{ matrix.os }}-${{ matrix.arch }}.tar.gz" -C dist mpr
+            rm dist/mpr
           fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mpr-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: mpr-*
+          merge-multiple: true
 
       - name: Checksums
         run: |
