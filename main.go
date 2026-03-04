@@ -14,6 +14,11 @@ var (
 )
 
 func main() {
+	// Set version variables for update checking
+	cli.Version = version
+	cli.GitCommit = gitCommit
+	cli.BuildTime = buildTime
+
 	var c cli.CLI
 	ctx := kong.Parse(&c,
 		kong.Name("mpr"),
@@ -26,6 +31,10 @@ func main() {
 		fmt.Printf("mpr %s (%s) built %s\n", version, gitCommit, buildTime)
 		return
 	}
+
+	// Perform background update check on startup (non-blocking)
+	// This will check once per day and only notify if an update is available
+	cli.AutoUpdateCheck(c.Globals.CacheDir)
 
 	ctx.FatalIfErrorf(ctx.Run(&c.Globals))
 }

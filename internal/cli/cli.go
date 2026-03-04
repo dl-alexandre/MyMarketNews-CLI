@@ -32,6 +32,7 @@ type CLI struct {
 	URL         URLCmd         `cmd:"" help:"Print the composed API URL"`
 	Curl        CurlCmd        `cmd:"" help:"Print an equivalent curl command"`
 	Completion  CompletionCmd  `cmd:"" help:"Generate shell completion script"`
+	CheckUpdate UpdateCheckCmd `cmd:"" help:"Check for available updates"`
 }
 
 // Globals contains global flags available to all commands
