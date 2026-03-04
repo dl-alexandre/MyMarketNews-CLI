@@ -2,10 +2,11 @@ package client
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/big"
 	"net"
 	"net/http"
 	"strconv"
@@ -96,12 +97,18 @@ func (c *Client) sleepBackoff(attempt int, resp *http.Response) {
 		}
 	}
 
-	base := time.Duration(1<<uint(attempt-1)) * time.Second
-	if base > 30*time.Second {
-		base = 30 * time.Second
+	// Use safe exponential backoff calculation to avoid integer overflow
+	var base time.Duration
+	if attempt <= 1 {
+		base = 1 * time.Second
+	} else if attempt >= 6 {
+		base = 30 * time.Second // Cap at 30s (2^5 = 32)
+	} else {
+		base = time.Duration(1<<(attempt-1)) * time.Second
 	}
-	jitter := time.Duration(rand.Intn(250)) * time.Millisecond
-	time.Sleep(base + jitter)
+
+	jitter, _ := rand.Int(rand.Reader, big.NewInt(250))
+	time.Sleep(base + time.Duration(jitter.Int64())*time.Millisecond)
 }
 
 func isRetryableStatus(code int) bool {

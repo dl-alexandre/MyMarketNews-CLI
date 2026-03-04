@@ -23,7 +23,7 @@ func LoadReports(ctx context.Context, c *client.Client, cacheDir string, ttl tim
 		return nil, false, err
 	}
 
-	if err := os.MkdirAll(resolvedDir, 0o755); err != nil {
+	if err := os.MkdirAll(resolvedDir, 0o750); err != nil {
 		return nil, false, err
 	}
 
@@ -82,6 +82,7 @@ func ResolveCacheDir(cacheDir string) (string, error) {
 }
 
 func readCache(path string, ttl time.Duration) (*ReportsCache, bool) {
+	// #nosec G304 - path is constructed from resolved internal cache directory only
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, false

@@ -34,7 +34,7 @@ func main() {
 
 	// Perform background update check on startup (non-blocking)
 	// This will check once per day and only notify if an update is available
-	cli.AutoUpdateCheck(c.Globals.CacheDir)
+	cli.AutoUpdateCheck(c.CacheDir)
 
 	ctx.FatalIfErrorf(ctx.Run(&c.Globals))
 }

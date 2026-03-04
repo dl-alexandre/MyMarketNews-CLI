@@ -94,7 +94,7 @@ func fetchLatestRelease(currentVersion string) (UpdateInfo, error) {
 	if err != nil {
 		return UpdateInfo{}, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -201,7 +201,7 @@ func compareVersions(v1, v2 string) int {
 			if idx := strings.IndexAny(part, "-"); idx != -1 {
 				part = part[:idx]
 			}
-			fmt.Sscanf(part, "%d", &num1)
+			_, _ = fmt.Sscanf(part, "%d", &num1) // #nosec G104 - parsing failure defaults to 0, which is safe
 		}
 
 		if i < len(parts2) {
@@ -209,7 +209,7 @@ func compareVersions(v1, v2 string) int {
 			if idx := strings.IndexAny(part, "-"); idx != -1 {
 				part = part[:idx]
 			}
-			fmt.Sscanf(part, "%d", &num2)
+			_, _ = fmt.Sscanf(part, "%d", &num2) // #nosec G104 - parsing failure defaults to 0, which is safe
 		}
 
 		if num1 < num2 {
@@ -239,6 +239,7 @@ func loadUpdateCache(cacheDir string) (UpdateInfo, bool) {
 	}
 
 	cachePath := filepath.Join(resolvedDir, "update.json")
+	// #nosec G304 - cachePath is constructed from resolved internal cache directory only
 	data, err := os.ReadFile(cachePath)
 	if err != nil {
 		return UpdateInfo{}, false
@@ -264,7 +265,7 @@ func saveUpdateCache(cacheDir string, info UpdateInfo) {
 		return
 	}
 
-	if err := os.MkdirAll(resolvedDir, 0o755); err != nil {
+	if err := os.MkdirAll(resolvedDir, 0o750); err != nil {
 		return
 	}
 
@@ -274,7 +275,7 @@ func saveUpdateCache(cacheDir string, info UpdateInfo) {
 		return
 	}
 
-	_ = os.WriteFile(cachePath, data, 0o644)
+	_ = os.WriteFile(cachePath, data, 0o600)
 }
 
 // AutoUpdateCheck performs a background update check (for use at startup)
