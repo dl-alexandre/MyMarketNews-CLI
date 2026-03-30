@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+	"github.com/dl-alexandre/cli-tools/version"
 	"mpr/internal/cli"
 )
 
@@ -14,10 +15,11 @@ var (
 )
 
 func main() {
-	// Set version variables for update checking
-	cli.Version = version
-	cli.GitCommit = gitCommit
-	cli.BuildTime = buildTime
+	// Set version info in cli-tools
+	version.Version = version
+	version.GitCommit = gitCommit
+	version.BuildTime = buildTime
+	version.BinaryName = "mpr"
 
 	var c cli.CLI
 	ctx := kong.Parse(&c,
