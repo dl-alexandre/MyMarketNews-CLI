@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
-	"github.com/dl-alexandre/cli-tools/version"
+	cliver "github.com/dl-alexandre/cli-tools/version"
 	"mpr/internal/cli"
 )
 
@@ -16,10 +16,10 @@ var (
 
 func main() {
 	// Set version info in cli-tools
-	version.Version = version
-	version.GitCommit = gitCommit
-	version.BuildTime = buildTime
-	version.BinaryName = "mpr"
+	cliver.Version = version
+	cliver.GitCommit = gitCommit
+	cliver.BuildTime = buildTime
+	cliver.BinaryName = "mpr"
 
 	var c cli.CLI
 	ctx := kong.Parse(&c,
@@ -30,7 +30,7 @@ func main() {
 
 	// If version flag was passed, print version and exit
 	if ctx.Command() == "version" || (len(ctx.Args) > 0 && ctx.Args[0] == "--version") {
-		fmt.Printf("mpr %s (%s) built %s\n", version, gitCommit, buildTime)
+		fmt.Printf("mpr %s (%s) built %s\n", cliver.Version, cliver.GitCommit, cliver.BuildTime)
 		return
 	}
 
