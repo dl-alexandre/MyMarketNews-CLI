@@ -3,7 +3,7 @@ module mpr
 go 1.25.6
 
 require (
-	github.com/alecthomas/kong v1.14.0
+	github.com/alecthomas/kong v1.15.0
 	github.com/dl-alexandre/cli-tools v0.0.1
 	github.com/spf13/cobra v1.10.2
 )
