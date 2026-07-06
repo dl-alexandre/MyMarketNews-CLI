@@ -103,20 +103,7 @@ brews:
     install: |
       bin.install "mpr"
 
-flatpak:
-  - app_id: net.ddns.dl-alexandre.MPRCLI
-    runtime: org.freedesktop.Platform
-    runtime_version: "24.08"
-    sdk: org.freedesktop.Sdk
-    finish_args:
-      - --share=network
-      - --filesystem=home
 
-srpm:
-  enabled: true
-  summary: "CLI for USDA AMS MyMarketNews Datamart API"
-  license: MIT
-  url: https://github.com/dl-alexandre/MyMarketNews-CLI
 
 scoops:
   - repository:
