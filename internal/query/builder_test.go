@@ -14,3 +14,15 @@ func TestBuilderQComposition(t *testing.T) {
 		t.Fatalf("unexpected q string\nwant: %s\n got: %s", want, got)
 	}
 }
+
+func TestBuilderSkipsEmptyAndTrimsInValues(t *testing.T) {
+	b := NewBuilder()
+	b.AddRaw(" ")
+	b.AddWhere("", "value")
+	b.AddWhere("field", "")
+	b.AddBetween("date", "", "end")
+	b.AddIn("kind", []string{"  one ", "", " two"})
+	if got, want := b.String(), "kind=one,two"; got != want {
+		t.Fatalf("String() = %q, want %q", got, want)
+	}
+}

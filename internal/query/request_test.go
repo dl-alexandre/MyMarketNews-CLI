@@ -128,3 +128,10 @@ func TestRequestURL(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestURLRejectsMalformedBaseURL(t *testing.T) {
+	_, err := (Request{BaseURL: "%", APIVersion: "v1.1", Endpoint: "reports"}).URL()
+	if err == nil {
+		t.Fatal("URL() accepted malformed base URL")
+	}
+}
